@@ -4,12 +4,9 @@ import logging
 from aiogram import Bot
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+
 from db_map import Base, MediaIds
-from   configimportTOKEN, MY_ID, DB_FILENAME
-
-
+from   config import TOKEN, MY_ID, DB_FILENAME
 
 logging.basicConfig(format=u'%(filename)s [ LINE:%(lineno)+3s ]#%(levelname)+8s [%(asctime)s] %(message)s',
                     level=logging.DEBUG)
