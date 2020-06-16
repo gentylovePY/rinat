@@ -1,26 +1,15 @@
 from aiogram import Bot, types
-from aiogram import Dispatcher
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher import Dispatcher, FSMContext
-import logging
+from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.bot import api
-from config import TOKEN
+from config import TOKEN, help_text
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from config import ADMIN_ID
-from asyncio import sleep
-from states import NewItem, Mailing
-from bd import  Users
 
 
-logging.basicConfig(format=u'%(filename)s [LINE:%(lineno)d] #%(levelname)-8s [%(asctime)s] %(message)s',
-                    level=logging.INFO)
-
-storage = MemoryStorage()
 
 PATCHES_URL="https://telegg.ru/orig/bot{token}/{method}"
 setattr(api,"API_URL",PATCHES_URL)
@@ -33,7 +22,7 @@ CAT_BIG_EYES = "https://avatars.mds.yandex.net/get-pdb/404799/e98ba488-cffa-4b42
 
 
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot,storage=storage)
+dp = Dispatcher(bot)
 Base = declarative_base()
 greet_kb1 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(KeyboardButton('Короткий гайд'))
 greet_kb2 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(KeyboardButton('Заработать 1000Р'))
@@ -78,16 +67,6 @@ async def process_start_command5(message: types.Message):
 async def process_photo_command(message: types.Message):
 
     await bot.send_photo(message.from_user.id,CAT_BIG_EYES)
-
-
-@dp.message_handler(user_id=ADMIN_ID, commands=["tell_everyone"])
-async def mailing(message: types.Message):
-    await message.answer("Пришлите текст рассылки")
-    await Mailing.Text.set()
-
-
-
-
 
 
 
