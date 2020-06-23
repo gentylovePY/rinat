@@ -1,8 +1,9 @@
-from main import bot,dp
-from aiogram.types import Message
-from config import ADMIN_ID
+from bd import mdb, search_or_save
 
+def sms(bot, update):
+    user = search_or_save(mdb, bot.effective_user, bot.message)  # получаем данные из базы данных
+    print(user)
 
-
-async def send_to_admin(dp):
-    await  bot.send_message(chat_id=ADMIN_ID,text="Бот запущен")
+    print('Кто-то отправил команду /start. Что мне делать?')  # вывод сообщения в консоль при отправки команды /start
+    bot.message.reply_text('Здравствуйте, {}! \nПоговорите со мной {}!'
+                           .format(bot.message.chat.first_name))  #
