@@ -1,6 +1,7 @@
 from asyncio import sleep
 
 from aiogram import Bot, types
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.utils import executor
 from aiogram.types import ReplyKeyboardRemove, \
@@ -23,11 +24,11 @@ setattr(api,"API_URL",PATCHES_URL)
 
 CAT_BIG_EYES = "https://avatars.mds.yandex.net/get-pdb/404799/e98ba488-cffa-4b42-8ed2-d6eb0914c01d/s1200?webp=false"
 
-
+storage = MemoryStorage()
 
 
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot,storage=storage)
 Base = declarative_base()
 greet_kb1 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(KeyboardButton('Короткий гайд'))
 greet_kb2 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(KeyboardButton('Заработать 1000Р'))
@@ -76,10 +77,11 @@ async def mailing(message: types.Message):
     await message.answer(("Пришлите текст рассылки"))
     await Mailing.Text.set()
 
+
 @dp.callback_query_handler(user_id=ADMIN_ID, state=Mailing.Text)
 async def mailing_start(call: types.CallbackQuery, state: FSMContext):
 
-
+    print("ddddd")
     c.execute("SELECT * FROM user")
     result = c.fetchall()
     for row in result:
@@ -92,7 +94,7 @@ async def mailing_start(call: types.CallbackQuery, state: FSMContext):
     await state.reset_state()
     await call.message.edit_reply_markup()
 
-    
+
     for user in a:
         try:
             await bot.send_message(chat_id=user.user_id,
