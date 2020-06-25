@@ -1,5 +1,7 @@
+from asyncio import sleep
+
 from aiogram import Bot, types
-from aiogram.dispatcher import Dispatcher
+from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.utils import executor
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
@@ -8,7 +10,7 @@ from aiogram.bot import api
 from config import *
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-
+from db import *
 import sqlite3
 con = sqlite3.connect("database.db")
 cur = con.cursor()
@@ -37,6 +39,8 @@ greet_kb4 = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).ad
 
 @dp.message_handler(commands=["start"])
 async def process_start_command(message: types.message):
+    if not check_if_exists(message.from_user.id):
+        register_new_user(message.from_user.id)
     await message.answer(start)
   
 
@@ -63,11 +67,40 @@ async def process_start_command5(message: types.Message):
 
 @dp.message_handler(commands=['photo'])
 async def process_photo_command(message: types.Message):
-    print(message.from_user.id)
+    print(message.from_user)
     await bot.send_photo(message.from_user.id,CAT_BIG_EYES)
 
 
+@dp.message_handler(user_id=ADMIN_ID, commands=["tell_everyone"])
+async def mailing(message: types.Message):
+    await message.answer(("Пришлите текст рассылки"))
+    await Mailing.Text.set()
 
+@dp.callback_query_handler(user_id=ADMIN_ID, state=Mailing.Text)
+async def mailing_start(call: types.CallbackQuery, state: FSMContext):
+
+
+    c.execute("SELECT * FROM user")
+    result = c.fetchall()
+    for row in result:
+        a = row[0]
+
+
+
+    data = await state.get_data()
+    text = data.get("text")
+    await state.reset_state()
+    await call.message.edit_reply_markup()
+
+    
+    for user in a:
+        try:
+            await bot.send_message(chat_id=user.user_id,
+                                   text=text)
+            await sleep(0.3)
+        except Exception:
+            pass
+    await call.message.answer(("Рассылка выполнена."))
 
 if __name__ == '__main__':
     executor.start_polling(dp)
