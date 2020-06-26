@@ -39,7 +39,7 @@ async def process_start_command2(message: types.Message):
    await bot.send_photo(message.from_user.id, gaid_photo, caption=gaid,reply_markup=greet_kb2)
 
 
-@dp.message_handler(text=["Заработать 1000Р",'Назад к заданию'])
+@dp.message_handler(text=['Назад к заданию'])
 async def process_start_command3(message: types.Message):
     await bot.send_photo(message.from_user.id, money_photo, caption="Пример к заполнению")
     await message.answer(money, reply_markup=greet_kb3)
